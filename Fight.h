@@ -5,17 +5,18 @@
 #include "Player.h"
 #include "Monster.h"
 #include "Act.h"
-#include "Item.h"
+#include "Items.h"
 
 using namespace std;
 
 class Fight {
-    public:
+    private:
         Player player;
         Monster monster;
         int tourActuel;
         string issue;
     
+    public:
         Fight(Player player, Monster monster, int tourActuel, string issue);
 
         string playersTurn(); // retourne le choix du joueur pour son tour
@@ -23,6 +24,9 @@ class Fight {
         ACT act(); // ACT -> retourne l'action décidée par le joueur
         Item item(); // ITEM -> retourne l'item décidé par le joueur, si c'est possible
         void mercy(); // MERCY -> mettre à jour nbVicoires si épargné
+
+        Monster getMonster();
+        string getIssue();
 };
 
 #endif

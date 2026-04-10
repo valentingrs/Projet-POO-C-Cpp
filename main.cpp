@@ -6,28 +6,44 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <string>
-#include "Player.cpp"
+#include <ctime>
+#include <cstdlib>
+#include "Player.h"
 
 using namespace std;
 
 // Lecture fichiers monsters.csv
-int ReadMonsters() {
+vector<Monster> ReadMonsters() {
+    vector<Monster> setMonstres;
+    string line;
     cout << "Répertoire actuel : " << filesystem::current_path() << endl;
     ifstream file("monsters.csv");
 
     if(!file.is_open()) {
         cout << "Fichier introuvable !" << endl;
-        return 1;
+        return setMonstres;
     }
 
-    string line;
-
     while(getline(file, line)) {
-        cout << "Ligne : " << line << endl;
+        if (line.empty()) continue;
+        stringstream ss(line);
+        string category, name, hp_str, atk_str, dfc_str, mercyGoal_str;
+
+        getline(ss, category, ';');
+        getline(ss, name, ';'); 
+        getline(ss, hp_str, ';'); int hp = stoi(hp_str);
+        getline(ss, atk_str, ';'); int atk = stoi(atk_str);
+        getline(ss, dfc_str, ';'); int dfc = stoi(dfc_str);
+        getline(ss, mercyGoal_str, ';');  int mercyGoal = stoi(mercyGoal_str);
+
+
+        vector<ACT> monsterActs;
+        Monster m(name, hp, category, atk, dfc, mercyGoal, monsterActs);
+        setMonstres.push_back(m);
     }
 
     file.close();
-    return 1;
+    return setMonstres;
 }
 
 Player setup() {
@@ -60,7 +76,13 @@ void DemarrerUnCombat() {
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
     cout << "Combat : " << endl;
     
-    int x = ReadMonsters();
+    vector<Monster> setMonstres = ReadMonsters();
+    srand(time(0));
+    int index = rand() % setMonstres.size();
+    Monster monsterFight = setMonstres[index];
+
+    cout << "Nom du monstre pioché pour le combat : " << monsterFight.getName() << endl;
+
     // Retour menu principal 
     _getch(); // Attendre que le joueur appuie sur entrée
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran

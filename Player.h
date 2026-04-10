@@ -7,14 +7,26 @@
 #include "Monster.h"
 
 class Player : public Entity {
-    public:
+    private:
         vector<Item> items; 
         int nbVictoires;
+        int nbKilled;
+        int nbSpared;
         vector<Monster> monstresVaincus;
 
+    public:
         Player(string personnage, int maxHP);
 
         vector<Item> getItems();
+        int getNbVictoires();
+        vector<Monster> getMonstresVaincus();
+        int getNbKilled();
+        int getNbSpared();
+
+        void addVictory();
+        void addMonstresVaincus(Monster monster);
+
+        void useItem(int index);
 };
 
 #endif

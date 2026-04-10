@@ -6,10 +6,6 @@ Entity::Entity(string name, int maxHP) {
     this->maxHP = maxHP;
 }
 
-bool Entity::isAlive() {
-    return true;
-}
-
 string Entity::getName() {
     return this->name;
 }
@@ -19,4 +15,8 @@ int Entity::getHP() {
 }
 int Entity::getMaxHP() {
     return this->maxHP;
+}
+
+int Entity::attack() {
+    return 0;// à moidifier
 }

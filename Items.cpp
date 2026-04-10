@@ -10,3 +10,11 @@ Item::Item(string nom, string type, int valeur, int quantite) {
     this->quantite = quantite;
 }
 
+string Item::getNom() { return nom; }
+string Item::getType() { return type; }
+int Item::getValeur() { return valeur; }
+int Item::getQuantite() { return quantite; }
+
+void Item::use(int qte) {
+    quantite = quantite - qte;
+}

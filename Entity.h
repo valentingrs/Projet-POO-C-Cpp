@@ -6,17 +6,18 @@
 using namespace std;
 
 class Entity {
-    public:
+    protected:
         string name;
         int HP;
         int maxHP;
 
+    public:
         Entity(string name, int maxHP);
 
         string getName();
         int getHP();
         int getMaxHP();
-        bool isAlive();
+        int attack();
 };
 
 #endif

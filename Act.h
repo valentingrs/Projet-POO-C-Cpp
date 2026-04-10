@@ -6,12 +6,15 @@
 using namespace std;
 
 class ACT {
-    public:
+    private:
         int id;
         string text;
         int impactMercy;
 
+    public:
         ACT(int id, string text, int impactMercy);
+        string getText();
+        int getImpactMercy();
 };
 
 #endif
