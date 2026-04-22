@@ -32,4 +32,12 @@ void Monster::setAct(ACT action) {
 }
 
 int Monster::getActCount() { return 0; } // à modifier
-bool Monster::canMercy() { return true; } // à modifier
+bool Monster::canMercy() {
+    return mercy >= mercyGoal;
+}
+
+int Monster::attack(Entity& target) {
+    int dmg = this->atk; 
+    target.takeDamage(dmg);
+    return dmg;
+}

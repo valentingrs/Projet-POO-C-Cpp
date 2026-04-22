@@ -32,6 +32,8 @@ class Monster : public Entity {
         // Methods
         int getActCount();
         bool canMercy();
+
+        int attack(Entity& target) override;
 };
 
 #endif

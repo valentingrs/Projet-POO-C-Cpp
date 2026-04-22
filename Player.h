@@ -3,8 +3,10 @@
 
 #include <vector>
 #include "Entity.h"
-#include "Items.h"
 #include "Monster.h"
+#include "Items.h"
+
+class Monster;
 
 class Player : public Entity {
     private:
@@ -23,10 +25,21 @@ class Player : public Entity {
         int getNbKilled();
         int getNbSpared();
 
-        void addVictory();
-        void addMonstresVaincus(Monster monster);
+        bool hasWon(); // true si victories == 10
 
-        void useItem(int index);
+        // Inventaire
+        void addItem(const Item& item); // Pointeur ?
+        bool useItem(int index);              // applique l'effet sur le joueur
+
+        void addVictory(bool monsterKilled);
+        void addMonstresVaincus(Monster& monster);
+
+        // Formule d'attaque 
+        int attack(Entity& target) override;
+
+        void displayStats()     const;
+        void displayInventory() const;
+
 };
 
 #endif

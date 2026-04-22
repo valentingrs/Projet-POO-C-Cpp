@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Fight::Fight(Player player, Monster monster, int tourActuel, string issue)
+Fight::Fight(Player& player, Monster& monster, int tourActuel, string issue)
     : player(player),
       monster(monster),
       tourActuel(tourActuel),
@@ -13,4 +13,4 @@ Fight::Fight(Player player, Monster monster, int tourActuel, string issue)
 }
 
 string Fight::getIssue() { return issue; }
-Monster Fight::getMonster() { return monster; }
+Monster& Fight::getMonster() { return monster; }

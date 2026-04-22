@@ -13,11 +13,21 @@ class Entity {
 
     public:
         Entity(string name, int maxHP);
+        virtual ~Entity() = default;
 
+        // Getters 
         string getName();
         int getHP();
         int getMaxHP();
-        int attack();
+
+        // Setters
+        void takeDamage(int dmg);
+        void heal(int amount);
+
+        // Méthode virtuelle pure : chaque entité attaque différemment
+        virtual int attack(Entity& target) = 0;
+
+        bool isAlive();
 };
 
 #endif
