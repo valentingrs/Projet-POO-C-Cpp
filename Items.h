@@ -18,6 +18,8 @@ class Item {
         string getType();
         int getValeur();
         int getQuantite();
+
+        friend ostream& operator<<(std::ostream& os, const Item& item); // pour faire cout << item << endl;
         
         void use(int amount);
 };

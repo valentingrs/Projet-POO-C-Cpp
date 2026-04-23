@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 #include "Player.h"
 #include "Monster.h"
 #include "Items.h"
@@ -35,6 +36,12 @@ void Player::addItem(const Item& item) {
     items.push_back(item);
 }
 bool Player::useItem(int index) { return true; } // à modifier
+
+void Player::displayItems() {
+    for(Item& it : items) {
+        cout << it << endl;
+    }
+}
 
 int Player::attack(Entity& target) {
     int dmg = 10; // Ou ta formule de dégâts

@@ -21,6 +21,10 @@ class Game {
         vector<Item> loadItems(string filepath); // chatGPT l'a mis en pointeur
         vector<Monster*> loadMonsters(string file);
 
+        // Getter
+        Player* getPlayer();
+        vector<Item> getItems();
+
         int mainMenu(); // à remettre en void
         void displayBestiary();
         void displayStats();
