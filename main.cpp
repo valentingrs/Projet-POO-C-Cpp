@@ -33,7 +33,15 @@ int main() {
         int choix = g.mainMenu();
 
         if (choix == 1) { g.displayBestiary(); }
-        if (choix == 2) { g.startFight(); }
+        if (choix == 2) { 
+            Fight fight = g.startFight(); 
+            fight.run();
+            g.checkEndingGame();
+            choix = 5; // Fin du jeu 
+        }
+        if (choix == 3) {
+            g.displayStats();
+        }
         if (choix == 4) {
             cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
             cout << "Items : " << endl;
@@ -45,6 +53,10 @@ int main() {
             // Retour menu principal 
             _getch(); // Attendre que le joueur appuie sur entrée
             cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
+        }
+        if (choix == 5) {
+            cout << "Fin du jeu !" << endl;
+            break;
         }
     }
 }

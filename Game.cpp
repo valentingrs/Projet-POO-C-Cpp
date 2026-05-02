@@ -15,11 +15,10 @@
 using namespace std;
 
 Game::Game(string fileMonsters, string fileItems) {
-    this->player = setup();
     this->monsters = loadMonsters(fileMonsters);
     this->victoires = 0;
     this->items = loadItems(fileItems);
-
+    this->player = setup();
 }
 
 Game::~Game() {
@@ -76,13 +75,18 @@ vector<Item> Game::loadItems(string filepath) {
 
 Player* Game::setup() {
     string pseudo;
-    cout << "Démarron une partie...\nRentrer un pseudo : ";
+    cout << "Démarrons une partie...\nRentrer un pseudo : ";
     cin >> pseudo;
 
     Player* player = new Player(pseudo, 100);
-
+    // Loading player's items
+    for (Item& it : this->items) {
+            player->addItem(it);
+    }
     cout << "\nChargement des fichiers...\nFichiers chargés !" << endl;
-    cout << "\nNom du joueur : " << player->getName() << "\nHP : " << player->getHP() << "\nItems : " << " "<< endl;
+
+    cout << "\nNom du joueur : " << player->getName() << "\nHP : " << player->getHP() << "\nItems : " << endl;
+    player->displayItems();
 
     cout << "Passer à la suite ...";
     _getch(); // Attendre que le joueur appuie sur entrée
@@ -125,6 +129,14 @@ vector<Monster*> Game::loadMonsters(string fileName) {
     return setMonstres;
 }
 
+Player* Game::getPlayer() {
+    return this->player;
+}
+
+vector<Item> Game::getItems() {
+    return this->items;
+}
+
 int Game::mainMenu() { // à remettre en void
     cout << "1 - Bestiaire\n2 - Démarrer un combat\n3 - Statisitques du personnage\n4 - Items\n5 - Quitter" << endl;   
     int choix = -1;
@@ -140,12 +152,42 @@ void Game::displayBestiary() {
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
     cout << "Bestiaire : " << endl;
 
+    vector<Monster> vaincus = player->getMonstresVaincus();
+
+    if (vaincus.empty()) {
+        cout << "Aucun monstre vaincu pour l'instant." << endl;
+    }
+
+    else {
+        for (int i = 0; i < vaincus.size() ; i++) {
+            Monster& m = vaincus[i];
+            cout << "\n[" << i+1 << "] " << m.getName() << endl;
+            cout << "  Catégorie : " << m.getCategory() << endl;
+            cout << "  HP max    : " << m.getMaxHP() << endl;
+            cout << "  ATK       : " << m.getAtk() << endl;
+            cout << "  DEF       : " << m.getDfc() << endl;
+            cout << "  Résultat  : " << (m.getMercy() >= 100 ? "Épargné" : "Tué") << endl;
+        }
+    }
+
     // Retour menu principal 
+    cout << "\nAppuyez sur une touche pour revenir au menu...";
     _getch(); // Attendre que le joueur appuie sur entrée
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
 }
 
 void Game::displayStats() {
+    cout << "\x1b[2J\x1b[H";
+    cout << "STATISTIQUES :" << endl;
+    cout << "Nom        : " << player->getName() << endl;
+    cout << "HP         : " << player->getHP() << "/" << player->getMaxHP() << endl;
+    cout << "Victoires  : " << player->getNbVictoires() << "/10" << endl;
+    cout << "Tués       : " << player->getNbKilled() << endl;
+    cout << "Épargnés   : " << player->getNbSpared() << endl;
+
+    cout << "\nAppuyez sur une touche pour revenir au menu...";
+    _getch();
+    cout << "\x1b[2J\x1b[H";
 }
 
 void Game::displayItems() {
@@ -154,6 +196,10 @@ void Game::displayItems() {
 Fight Game::startFight() {
     // Initialisation et retour d'un objet Fight
     // (Attention : nécessite que le constructeur de Fight soit défini)
+
+    // Réinitialisation des HP du player après un précédent combat
+    if (player->getHP() < player->getMaxHP()) { player->heal(player->getMaxHP()); }
+    
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
     cout << "Combat : " << endl;
     
@@ -162,8 +208,10 @@ Fight Game::startFight() {
     Monster* monsterFight = monsters[index]; // adresse mémoire d'un mopnstre
 
     cout << "Nom du monstre pioché pour le combat : " << monsterFight->getName() << endl;
+    cout << "PV : " << monsterFight->getHP() << "/" << monsterFight->getMaxHP() << " | MERCY : " << monsterFight->getMercy() << "/100" << endl;
 
     // Retour menu principal 
+    cout << "\nAppuyez sur Entrée pour démarrer le combat..." << endl;
     _getch(); // Attendre que le joueur appuie sur entrée
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
 
@@ -175,6 +223,22 @@ void Game::quit() {
 }
 
 bool Game::checkEndingGame() {
-    // Vérification des conditions de fin (victoire ou défaite totale)
-    return false;
+    if (!player->hasWon()) false;
+
+    cout << "\x1b[2J\x1b[H";
+    cout << "FIN DE PARTIE" << endl;
+    cout << "Monstres tués    : " << player->getNbKilled() << endl;
+    cout << "Monstres épargnés: " << player->getNbSpared() << endl;
+
+    if (player->getNbKilled() == 10) {
+        cout << "\n FIN GENOCIDAIRE" << endl;
+        cout << "Vous avez tués tous les monstres..." << endl;
+    } else if (player->getNbSpared() == 10) {
+        cout << "\n FIN PACIFISTE" << endl;
+        cout << "Vous avez épargné tous les monstres." << endl;
+    } else {
+        cout << "\n FIN NEUTRE" << endl;
+        cout << "Vous avez à la fois tué et épargné..." << endl;
+    }
+    return true;
 }

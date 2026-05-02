@@ -32,14 +32,31 @@ void Player::addMonstresVaincus(Monster& monstre) {
 }
 
 bool Player::hasWon() { return (nbVictoires == 10); }
+
 void Player::addItem(const Item& item) {
     items.push_back(item);
 }
-bool Player::useItem(int index) { return true; } // à modifier
+
+bool Player::useItem(int index) {
+    Item it = items[index];
+
+    if (it.getQuantite() == 0) {
+        cout << "Item épuise, vous n'en avez plus !" << endl;
+        return false;
+    }
+
+    cout << "Vous utilisez " << it.getNom() << endl;
+    it.applyEffect(*this); // application sur l'objet lui même
+    it.use(1);
+    return true;
+
+}
 
 void Player::displayItems() {
+    int i = 1;
     for(Item& it : items) {
-        cout << it << endl;
+        cout << i << ". " << it << endl;
+        i++;
     }
 }
 

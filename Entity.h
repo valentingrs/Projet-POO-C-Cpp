@@ -20,7 +20,7 @@ class Entity {
         int getHP();
         int getMaxHP();
 
-        // Setters
+        // Agissent comme des setters
         void takeDamage(int dmg);
         void heal(int amount);
 

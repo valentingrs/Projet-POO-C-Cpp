@@ -28,8 +28,9 @@ class Player : public Entity {
         bool hasWon(); // true si victories == 10
 
         // Inventaire
-        void addItem(const Item& item); // Pointeur ?
+        void addItem(const Item& item); // Référence pour éviter les copies de items
         bool useItem(int index);              // applique l'effet sur le joueur
+        void displayItems();
 
         void addVictory(bool monsterKilled);
         void addMonstresVaincus(Monster& monster);

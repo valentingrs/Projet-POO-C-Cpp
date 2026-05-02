@@ -1,6 +1,7 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
+#include "Entity.h"
 #include <string>
 
 using namespace std;
@@ -22,6 +23,7 @@ class Item {
         friend ostream& operator<<(std::ostream& os, const Item& item); // pour faire cout << item << endl;
         
         void use(int amount);
+        void applyEffect(Entity& target);
 };
 
 #endif
