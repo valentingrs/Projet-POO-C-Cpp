@@ -14,14 +14,14 @@ class Player : public Entity {
         int nbVictoires;
         int nbKilled;
         int nbSpared;
-        vector<Monster> monstresVaincus;
+        vector<Monster*> monstresVaincus;
 
     public:
         Player(string personnage, int maxHP);
 
         vector<Item> getItems();
         int getNbVictoires();
-        vector<Monster> getMonstresVaincus();
+        vector<Monster*> getMonstresVaincus();
         int getNbKilled();
         int getNbSpared();
 
@@ -33,7 +33,7 @@ class Player : public Entity {
         void displayItems();
 
         void addVictory(bool monsterKilled);
-        void addMonstresVaincus(Monster& monster);
+        void addMonstresVaincus(Monster* monster);
 
         // Formule d'attaque 
         int attack(Entity& target) override;

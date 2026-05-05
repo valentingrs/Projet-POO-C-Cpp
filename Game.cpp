@@ -5,16 +5,22 @@
 #include <sstream>
 #include <stdlib.h>
 #include <conio.h>
+#include <map>
 #include <string>
 #include <ctime>
 #include <cstdlib>
 #include "Fight.h"
 #include "Game.h"
+#include "Monster.h"
 #include "Player.h"
+#include "Normal.h"
+#include "MiniBoss.h"
+#include "Boss.h"
 
 using namespace std;
 
 Game::Game(string fileMonsters, string fileItems) {
+    this->catalogueActs = loadActs();
     this->monsters = loadMonsters(fileMonsters);
     this->victoires = 0;
     this->items = loadItems(fileItems);
@@ -117,16 +123,58 @@ vector<Monster*> Game::loadMonsters(string fileName) {
         getline(ss, hp_str, ';'); int hp = stoi(hp_str);
         getline(ss, atk_str, ';'); int atk = stoi(atk_str);
         getline(ss, dfc_str, ';'); int dfc = stoi(dfc_str);
-        getline(ss, mercy_str, ';');  int mercy = stoi(mercy_str);
+        getline(ss, mercy_str, ';');  
 
+        // Trim category et name
+        auto trim = [](string& s) {
+            s.erase(0, s.find_first_not_of(" \t\r\n"));
+            s.erase(s.find_last_not_of(" \t\r\n") + 1);
+        };
+        trim(category); trim(name);
 
+        // Chargement des Acts du monstre
         vector<ACT> monsterActs;
-        Monster* m = new Monster(name, hp, category, atk, dfc, mercy, 100, monsterActs);
+        string actName;
+        while(getline(ss, actName, ';')) {
+            trim(actName);
+            if(actName == "-" || actName.empty()) continue;
+            if(catalogueActs.count(actName)) {
+                monsterActs.push_back(catalogueActs.at(actName));
+            } else {
+                cerr << "ACT '" << actName << " 'introuvable dans le catalogue." << endl;
+            }
+        }
+        
+        // Instancier Normal/MiniBoss/Boss selon category
+        Monster* m = nullptr;
+        if      (category == "NORMAL")   m = new Normal(name, hp, atk, dfc, 0, 100, monsterActs);
+        else if (category == "MINIBOSS") m = new MiniBoss(name, hp, atk, dfc, 0, 100, monsterActs);
+        else                             m = new Boss(name, hp, atk, dfc, 0, 100, monsterActs);
+
         setMonstres.push_back(m);
     }
 
     file.close();
     return setMonstres;
+}
+
+map<string, ACT> Game::loadActs() {
+    map<string, ACT> setActs;
+
+    // Au minimum 8 actions, dont 2 négatives
+    setActs["JOKE"]        = ACT(1, "Joke",        "Tu racontes une blague nulle... le monstre rigole quand même.", +20);
+    setActs["COMPLIMENT"]  = ACT(2, "Compliment",  "Tu dis au monstre qu'il a de beaux yeux. Il rougit.", +25);
+    setActs["DISCUSS"]     = ACT(3, "Discuss",     "Vous discutez de la météo. Ambiance détendue.", +15);
+    setActs["OBSERVE"]     = ACT(4, "Observe",     "Tu l'observes attentivement. Il se sent important.", +10);
+    setActs["PET"]         = ACT(5, "Pet",         "Tu lui fais un câlin. Inattendu mais efficace.", +30);
+    setActs["OFFER_SNACK"] = ACT(6, "Offer Snack", "Tu lui offres un snack. Il accepte avec joie.", +20);
+    setActs["REASON"]      = ACT(7, "Reason",      "Tu tentes de raisonner le monstre. Il réfléchit...", +15);
+    setActs["DANCE"]       = ACT(8, "Dance",       "Tu danses. Le monstre ne sait pas quoi penser.", +10);
+    // 2 actions négatives obligatoires
+    setActs["INSULT"]      = ACT(9, "Insult",      "Tu insultes le monstre. Mauvaise idée.", -20);
+    setActs["MOCK"]        = ACT(10, "Mock",       "Tu te moques de lui. Il est furieux.", -15);
+
+    return setActs;
 }
 
 Player* Game::getPlayer() {
@@ -152,7 +200,7 @@ void Game::displayBestiary() {
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
     cout << "Bestiaire : " << endl;
 
-    vector<Monster> vaincus = player->getMonstresVaincus();
+    vector<Monster*> vaincus = player->getMonstresVaincus();
 
     if (vaincus.empty()) {
         cout << "Aucun monstre vaincu pour l'instant." << endl;
@@ -160,13 +208,13 @@ void Game::displayBestiary() {
 
     else {
         for (int i = 0; i < vaincus.size() ; i++) {
-            Monster& m = vaincus[i];
-            cout << "\n[" << i+1 << "] " << m.getName() << endl;
-            cout << "  Catégorie : " << m.getCategory() << endl;
-            cout << "  HP max    : " << m.getMaxHP() << endl;
-            cout << "  ATK       : " << m.getAtk() << endl;
-            cout << "  DEF       : " << m.getDfc() << endl;
-            cout << "  Résultat  : " << (m.getMercy() >= 100 ? "Épargné" : "Tué") << endl;
+            Monster* m = vaincus[i];
+            cout << "\n[" << i+1 << "] " << m->getName() << endl;
+            cout << "  Catégorie : " << m->getCategory() << endl;
+            cout << "  HP max    : " << m->getMaxHP() << endl;
+            cout << "  ATK       : " << m->getAtk() << endl;
+            cout << "  DEF       : " << m->getDfc() << endl;
+            cout << "  Résultat  : " << (m->getMercy() >= 100 ? "Épargné" : "Tué") << endl;
         }
     }
 
@@ -210,10 +258,13 @@ Fight Game::startFight() {
     cout << "Nom du monstre pioché pour le combat : " << monsterFight->getName() << endl;
     cout << "PV : " << monsterFight->getHP() << "/" << monsterFight->getMaxHP() << " | MERCY : " << monsterFight->getMercy() << "/100" << endl;
 
+    // gestion du catalogue des ACT pour le combat
+
     // Retour menu principal 
     cout << "\nAppuyez sur Entrée pour démarrer le combat..." << endl;
     _getch(); // Attendre que le joueur appuie sur entrée
     cout << "\x1b[2J\x1b[H"; // Nettoyer l'écran
+
 
     return Fight(*player, *monsterFight, 0, "Started");
 }
@@ -223,7 +274,7 @@ void Game::quit() {
 }
 
 bool Game::checkEndingGame() {
-    if (!player->hasWon()) false;
+    if (!player->hasWon()) return false;
 
     cout << "\x1b[2J\x1b[H";
     cout << "FIN DE PARTIE" << endl;

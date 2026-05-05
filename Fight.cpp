@@ -1,6 +1,9 @@
 #include <string>
 #include <iostream>
+#include <vector>
+#include <map>
 #include "Fight.h"
+#include "Act.h"
 #include "Monster.h"
 
 using namespace std;
@@ -42,7 +45,7 @@ void Fight::run() {
         if (!monster.isAlive()) {
             issue = "Win";
             player.addVictory(true); // true = monstre tué
-            player.addMonstresVaincus(monster);
+            player.addMonstresVaincus(&monster);
             cout << "Le monstre a été tué !" << endl;
             break;
         }
@@ -106,7 +109,27 @@ void Fight::monsterAttack() {
 }
 
 void Fight::act() {
-    cout << "Utilisation d'un ACT" << endl;
+    vector<ACT> catalogueACTFight = monster.getActs();
+
+    cout << "\n--- ACT ---" << endl;
+    for (int i = 0; i < (int)catalogueACTFight.size(); i++) {
+        cout << "[" << i + 1 << " ] " << catalogueACTFight[i].getName() << endl;
+    }
+
+    int choix = -1;
+    while (choix < 1 || choix > (int)catalogueACTFight.size()) {
+        cout << "Choix : ";
+        cin >> choix;
+    }
+
+    ACT& chosen = catalogueACTFight[choix - 1];
+    cout << "\n" << chosen.getText() << endl;
+
+    int newMercy = monster.getMercy() + chosen.getImpactMercy();
+    newMercy = max(0, min(newMercy, 100));
+    monster.setMercy(newMercy);
+
+    cout << "Mercy : " << monster.getMercy() << "/100" << endl;
 }
 
 void Fight::item() {
@@ -134,7 +157,7 @@ void Fight::mercy() {
         this->issue = "Epargne";
 
         player.addVictory(false);
-        player.addMonstresVaincus(monster);
+        player.addMonstresVaincus(&monster);
     }
     else {
         cout << monster.getName() << " ne veut pas être épargné..." << endl;
@@ -144,3 +167,4 @@ void Fight::mercy() {
 
 string Fight::getIssue() { return issue; }
 Monster& Fight::getMonster() { return monster; }
+

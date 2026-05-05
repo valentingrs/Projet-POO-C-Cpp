@@ -30,8 +30,6 @@ void Monster::setMercy(int amount) {
 void Monster::setAct(ACT action) {
     acts.push_back(action);
 }
-
-int Monster::getActCount() { return 0; } // à modifier
 bool Monster::canMercy() {
     return mercy >= mercyGoal;
 }

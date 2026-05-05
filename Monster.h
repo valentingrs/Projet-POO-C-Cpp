@@ -18,7 +18,8 @@ class Monster : public Entity {
         vector<ACT> acts;
 
     public:
-        Monster(string personnage, int maxHP, string category, int atk, int dfc, int mercy, int mercyGoal, vector<ACT> acts);
+        Monster(string personnage, int maxHP, string category, int atk, int dfc, int mercy, int mercyGoal, vector<ACT> actNames);
+        virtual ~Monster() = default;
 
         string getCategory();
         int getAtk();
@@ -29,8 +30,10 @@ class Monster : public Entity {
         void setMercy(int amount);
         void setAct(ACT act);
 
+        virtual int getActCount() = 0;
+        virtual void afficherMenuAct() = 0;
+
         // Methods
-        int getActCount();
         bool canMercy();
 
         int attack(Entity& target) override;

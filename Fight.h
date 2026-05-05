@@ -2,6 +2,8 @@
 #define FIGHT_H
 
 #include <string>
+#include <map>
+#include <vector>
 #include "Player.h"
 #include "Monster.h"
 #include "Act.h"
